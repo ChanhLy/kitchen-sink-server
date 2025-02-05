@@ -1,0 +1,12 @@
+@userId = 1
+@origin = http://localhost:8080
+
+### get users
+GET {{origin}}/v1/api/users
+
+### get users by id
+GET {{origin}}/v1/api/users/{{userId}}
+
+### create user
+POST {{origin}}/v1/api/users
+

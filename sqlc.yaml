@@ -1,0 +1,15 @@
+version: "2"
+sql:
+  - engine: "sqlite"
+    queries: "**/*.query.sql"
+    schema: "db/schema.sql"
+    gen:
+      go:
+        package: "database"
+        out: "db"
+
+overrides:
+  go: null
+plugins: [ ]
+rules: [ ]
+options: { }
