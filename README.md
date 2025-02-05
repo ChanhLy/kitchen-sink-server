@@ -2,10 +2,11 @@
 A Go server template project created from years of experience working in web development.
 
 # Installation
-make init-macos
-
+Dependencies: homebrew
+  
+`$ make init-macos`
 # Start
-go run .
+`$ go run .`
 
 # Technologies
 - Go-Chi
