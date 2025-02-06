@@ -7,9 +7,10 @@ import (
 )
 
 type Config struct {
-	Logs LogConfig
-	DB   SQLiteConfig
-	Port string
+	Logs        LogConfig
+	DB          SQLiteConfig
+	Port        string
+	ProjectPath string
 }
 
 type LogConfig struct {
@@ -30,9 +31,9 @@ type SQLiteConfig struct {
 
 var cfg *Config
 
-func LoadConfig() (*Config, error) {
+func GetConfig() *Config {
 	if cfg != nil {
-		return cfg, nil
+		return cfg
 	}
 
 	cfg = &Config{
@@ -44,6 +45,7 @@ func LoadConfig() (*Config, error) {
 		DB: SQLiteConfig{
 			Path: os.Getenv("DB_URL"),
 		},
+		ProjectPath: os.Getenv("PROJECT_PATH"),
 	}
 
 	if cfg.DB.Path == "" {
@@ -51,6 +53,11 @@ func LoadConfig() (*Config, error) {
 		cfg.DB.Path = ":memory:"
 	}
 
+	if cfg.ProjectPath == "" {
+		log.Println("PROJECT_PATH env variable not set, may cause some tests to FAIL")
+	}
+
 	log.Println("Config loaded")
-	return cfg, nil
+
+	return cfg
 }

@@ -14,10 +14,7 @@ var queries *Queries
 
 func ConnectDB() *Queries {
 	log.Println("Connecting to database...")
-	cfg, errConfig := utils.LoadConfig()
-	if errConfig != nil {
-		log.Fatal(errConfig)
-	}
+	cfg := utils.GetConfig()
 
 	connection, openDbErr := sql.Open("sqlite3", cfg.DB.Path)
 
@@ -43,9 +40,11 @@ func runDbSchemas(connection *sql.DB) {
 		log.Fatal(err)
 	}
 
+	cfg := utils.GetConfig()
+
 	// Tests are run with test file's working directory, not from kitchen-sink-server directory
 	// Ex: .../kitchen-sink-server/users/user_test.go will have base wd equal .../kitchen-sink-server/users, not .../kitchen-sink-server
-	schemaFilePath := strings.Split(wd, "/kitchen-sink-server")[0] + "/kitchen-sink-server/db/schema.sql"
+	schemaFilePath := strings.Split(wd, cfg.ProjectPath)[0] + cfg.ProjectPath + "/db/schema.sql"
 
 	file, err := os.ReadFile(schemaFilePath)
 	if err != nil {
