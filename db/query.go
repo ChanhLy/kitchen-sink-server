@@ -43,9 +43,9 @@ func runDbSchemas(connection *sql.DB) {
 		log.Fatal(err)
 	}
 
-	// Tests are run with test file's working directory, not from server directory
-	// Ex: .../server/users/user_test.go will have base wd equal .../server/users, not .../server
-	schemaFilePath := strings.Split(wd, "/server")[0] + "/server/db/schema.sql"
+	// Tests are run with test file's working directory, not from kitchen-sink-server directory
+	// Ex: .../kitchen-sink-server/users/user_test.go will have base wd equal .../kitchen-sink-server/users, not .../kitchen-sink-server
+	schemaFilePath := strings.Split(wd, "/kitchen-sink-server")[0] + "/kitchen-sink-server/db/schema.sql"
 
 	file, err := os.ReadFile(schemaFilePath)
 	if err != nil {
