@@ -11,8 +11,9 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    env: 
-      PROJECT_PATH: /kitchen-sink-server/kitchen-sink-server # github actions duplicate project name
+    env:
+      PROJECT_PATH: /kitchen-sink-server/kitchen-sink-server # GitHub actions duplicate project name
+      DB_URL: ":memory:"
     steps:
     - uses: actions/checkout@v4
 
@@ -26,3 +27,9 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+
+    - name: Download Go Migrate
+      run: curl -L https://github.com/golang-migrate/migrate/releases/download/$version/migrate.$os-$arch.tar.gz | tar xvz
+
+    - name: Test Migration Script
+      run: make migrate-up
