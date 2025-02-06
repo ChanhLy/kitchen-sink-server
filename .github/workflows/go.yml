@@ -13,6 +13,8 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    env: 
+      PROJECT_PATH: /kitchen-sink-server/kitchen-sink-server # github actions duplicate project name
     steps:
     - uses: actions/checkout@v4
 
