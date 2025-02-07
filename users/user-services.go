@@ -8,8 +8,8 @@ import (
 )
 
 func GetUsers(ctx context.Context) ([]database.User, error) {
-	queries := database.GetQueries()
-	users, err := queries.GetUsers(ctx)
+	db := database.GetDb()
+	users, err := db.GetUsers(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -18,8 +18,8 @@ func GetUsers(ctx context.Context) ([]database.User, error) {
 }
 
 func GetUserById(id int64, ctx context.Context) (database.User, error) {
-	queries := database.GetQueries()
-	user, err := queries.GetUserById(ctx, id)
+	db := database.GetDb()
+	user, err := db.GetUserById(ctx, id)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		return database.User{}, nil
@@ -33,9 +33,9 @@ func GetUserById(id int64, ctx context.Context) (database.User, error) {
 }
 
 func CreateUser(data database.CreateUserParams, ctx context.Context) (database.User, error) {
-	queries := database.GetQueries()
+	db := database.GetDb()
 
-	user, err := queries.CreateUser(ctx, data)
+	user, err := db.CreateUser(ctx, data)
 	if err != nil {
 		return database.User{}, err
 	}

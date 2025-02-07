@@ -1,43 +1,69 @@
 package router
 
 import (
+	"context"
+	"errors"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	database "go-server/db"
 	"go-server/users"
+	"go-server/utils"
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"os/signal"
 	"time"
 )
 
-func Listen() *chi.Mux {
-	r := chi.NewRouter()
+func GetHandlers() *chi.Mux {
+	router := chi.NewRouter()
 
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.RedirectSlashes)
-	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
-	r.Use(middleware.Heartbeat("/ping"))
-	r.Use(middleware.Timeout(60 * time.Second))
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.RedirectSlashes)
+	router.Use(middleware.RequestID)
+	router.Use(middleware.RealIP)
+	router.Use(middleware.Heartbeat("/ping"))
+	router.Use(middleware.Timeout(60 * time.Second))
 
-	r.Mount("/", users.UserHandlers())
+	router.Mount("/", users.UserHandlers())
 
-	listenAndServe(r)
-
-	return r
+	return router
 }
 
-func listenAndServe(r *chi.Mux) {
-	l, errListen := net.Listen("tcp", ":8080")
-	if errListen != nil {
-		log.Fatal(errListen)
+func ListenAndServe(handler http.Handler) {
+	server := &http.Server{
+		Addr:           utils.GetConfig().Port,
+		Handler:        handler,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
 	}
 
-	log.Println("Listening on", l.Addr())
+	idleConnectionsClosed := make(chan struct{})
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt)
+		<-sigint
 
-	err := http.Serve(l, r)
-	if err != nil {
-		log.Fatal(err)
+		log.Println("We received an interrupt signal, shut down.")
+		if err := server.Shutdown(context.Background()); err != nil {
+			// Error from closing listeners, or context timeout:
+			log.Printf("HTTP server Shutdown: %v", err)
+		}
+		database.CloseDb()
+		close(idleConnectionsClosed)
+	}()
+
+	l, _ := net.Listen("tcp", utils.GetConfig().Port)
+
+	log.Println("Listening on " + utils.GetConfig().Port)
+
+	if err := server.Serve(l); !errors.Is(err, http.ErrServerClosed) {
+		// Error starting or closing listener:
+		log.Fatalf("HTTP server ListenAndServe: %v", err)
 	}
+
+	<-idleConnectionsClosed
 }

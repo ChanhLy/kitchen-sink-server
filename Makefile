@@ -17,4 +17,3 @@ migrate-down:
 
 generate-db:
 	sqlc generate
-
