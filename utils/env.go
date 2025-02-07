@@ -49,12 +49,18 @@ func GetConfig() *Config {
 	}
 
 	if cfg.DB.Path == "" {
-		log.Println("DB_URL env variable not set, use memory db")
 		cfg.DB.Path = ":memory:"
+		log.Println("DB_URL env variable not set, use memory db")
 	}
 
 	if cfg.ProjectPath == "" {
+		cfg.ProjectPath = "/kitchen-sink-server"
 		log.Println("PROJECT_PATH env variable not set, may cause some tests to FAIL")
+	}
+
+	if cfg.Port == "" {
+		cfg.Port = ":8080"
+		log.Println("PORT env variable not set, default :8080")
 	}
 
 	log.Println("Config loaded")

@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
-	database.ConnectDB()
-	router.Listen()
+	database.GetDb()
+	router.ListenAndServe(router.GetHandlers())
+
 }
